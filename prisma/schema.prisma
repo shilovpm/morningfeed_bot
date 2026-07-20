@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  telegramId   String    @unique @map("telegram_id")
+  username     String?
+  firstName    String?   @map("first_name")
+  lastName     String?   @map("last_name")
+  languageCode String?   @default("ru") @map("language_code")
+  timezone     String    @default("UTC")
+  plan         String    @default("free")
+  isAdmin      Boolean   @default(false) @map("is_admin")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  digests      Digest[]
+  settings     UserSettings?
+  usage        Usage[]
+
+  @@map("users")
+}
+
+model Digest {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  name       String
+  frequency  String    // "daily" | "weekly"
+  localTime  String    @map("local_time") // "HH:MM"
+  weekday    Int?      // 0-6 for weekly
+  isActive   Boolean   @default(true) @map("is_active")
+  lastRunAt  DateTime? @map("last_run_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channels DigestChannel[]
+  runs     Run[]
+
+  @@map("digests")
+}
+
+model Channel {
+  id             String    @id @default(cuid())
+  username       String    @unique
+  title          String?
+  description    String?
+  isPrivate      Boolean   @default(false) @map("is_private")
+  isActive       Boolean   @default(true) @map("is_active")
+  lastCheckedAt  DateTime? @map("last_checked_at")
+  // Web scraping cursor tracking
+  lastMessageId  String?   @map("last_message_id")
+  lastFetchedAt  DateTime? @map("last_fetched_at")
+  etag           String?
+  fetchStatus    String    @default("active") @map("fetch_status")
+  retryAfter     DateTime? @map("retry_after")
+  // Robust pagination state (before-based pagination)
+  lowestMessageId       String?   @map("lowest_message_id")
+  lastSeenMessageId     String?   @map("last_seen_message_id")
+  paginationFailureCount Int      @default(0) @map("pagination_failure_count")
+  lastDeepFetchAt       DateTime? @map("last_deep_fetch_at")
+  isHighVolume          Boolean   @default(false) @map("is_high_volume")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  digestChannels DigestChannel[]
+
+  @@map("channels")
+}
+
+model DigestChannel {
+  id        String   @id @default(cuid())
+  digestId  String   @map("digest_id")
+  channelId String   @map("channel_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  digest  Digest  @relation(fields: [digestId], references: [id], onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([digestId, channelId])
+  @@map("digest_channels")
+}
+
+model Run {
+  id                  String    @id @default(cuid())
+  digestId            String    @map("digest_id")
+  status              String    // "scheduled" | "running" | "success" | "error" | "empty" | "failed_openai_empty"
+  scheduledFor        DateTime  @map("scheduled_for")
+  windowStart         DateTime  @map("window_start")
+  windowEnd           DateTime  @map("window_end")
+  postsCount          Int       @default(0) @map("posts_count")
+  tokensUsed          Int       @default(0) @map("tokens_used")
+  errorMessage        String?   @map("error_message")
+  summary             String?
+  openaiRequestId     String?   @map("openai_request_id")
+  openaiModel         String?   @map("openai_model")
+  openaiEndpointType  String?   @map("openai_endpoint_type")
+  openaiFinishReason  String?   @map("openai_finish_reason")
+  debugMetadata       Json?     @map("debug_metadata")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  completedAt         DateTime? @map("completed_at")
+
+  digest Digest @relation(fields: [digestId], references: [id], onDelete: Cascade)
+
+  @@map("runs")
+}
+
+model UserSettings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique @map("user_id")
+  openaiModel        String   @default("gpt-5-mini") @map("openai_model")
+  summaryLength      String   @default("medium") @map("summary_length") // "short" | "medium" | "long"
+  temperature        String   @default("0.3")
+  maxTokens          Int      @default(2000) @map("max_tokens")
+  emailNotifications Boolean  @default(true) @map("email_notifications")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Usage {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  tokensIn   Int      @default(0) @map("tokens_in")
+  tokensOut  Int      @default(0) @map("tokens_out")
+  model      String
+  periodDate DateTime @map("period_date")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage")
+}

@@ -1,0 +1,37 @@
+{
+  "name": "morningfeed-bot",
+  "version": "1.0.0",
+  "description": "A self-hosted Telegram bot that turns public channel posts into scheduled AI summaries.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "build": "prisma generate && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "node dist/index.js",
+    "check": "prisma generate && tsc",
+    "test": "tsx --test server/utils/*.test.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "security:audit": "npm audit --omit=dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.6.0",
+    "openai": "^6.48.0",
+    "telegraf": "^4.16.3",
+    "tiktoken": "^1.0.22",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.12",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.3"
+  }
+}
