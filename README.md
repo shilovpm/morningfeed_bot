@@ -36,8 +36,8 @@ The scraper depends on Telegram's public HTML pages, which are not a documented 
 ## Quick start
 
 ```bash
-git clone https://github.com/shelovesclock/Morning_bot.git
-cd Morning_bot
+git clone https://github.com/shelovesclock/morningfeed_bot.git
+cd morningfeed_bot
 cp .env.example .env
 npm ci
 npm run db:push
