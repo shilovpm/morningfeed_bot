@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 
 // Environment configuration
 export const OPENAI_CONFIG = {
-  SUMMARY_MODEL: process.env.OPENAI_SUMMARY_MODEL || 'gpt-5-mini',
+  SUMMARY_MODEL: process.env.OPENAI_SUMMARY_MODEL || 'gpt-6-luna',
   FALLBACK_MODEL: process.env.OPENAI_FALLBACK_MODEL || 'gpt-4.1-mini',
   ENDPOINT: process.env.OPENAI_ENDPOINT || 'auto', // auto | responses | chat
   DEBUG: process.env.OPENAI_DEBUG === 'true',
@@ -287,7 +287,7 @@ export class OpenAIAdapter {
 
   /**
    * Determine which API endpoint to use based on model
-   * GPT-5 models MUST use Responses API
+   * GPT-5 and GPT-6 models MUST use Responses API
    * All other models (including fallback gpt-4o) use Chat API
    */
   private determineEndpoint(model: string): 'responses' | 'chat' {
@@ -295,9 +295,9 @@ export class OpenAIAdapter {
     if (OPENAI_CONFIG.ENDPOINT === 'responses') return 'responses';
     if (OPENAI_CONFIG.ENDPOINT === 'chat') return 'chat';
     
-    // Fixed routing: GPT-5 → Responses API, everything else → Chat API
+    // Fixed routing: GPT-5/GPT-6 → Responses API, everything else → Chat API
     const modelLower = model.toLowerCase();
-    if (modelLower.includes('gpt-5')) {
+    if (modelLower.includes('gpt-5') || modelLower.includes('gpt-6')) {
       return 'responses';
     }
     
@@ -323,7 +323,7 @@ export class OpenAIAdapter {
   }
 
   /**
-   * Call OpenAI Responses API (for GPT-5)
+   * Call OpenAI Responses API (for GPT-5/GPT-6)
    */
   private async callResponsesAPI(request: OpenAIRequest, requestId: string): Promise<OpenAIResponse> {
     const { model, messages, maxTokens, temperature } = request;
@@ -342,6 +342,12 @@ export class OpenAIAdapter {
       input,
       max_output_tokens: maxTokens
     };
+
+    if (model === 'gpt-6-luna') {
+      params.reasoning = { effort: 'low' };
+    } else if (model === 'gpt-6-sol') {
+      params.reasoning = { effort: 'medium' };
+    }
 
     // Note: GPT-5 Responses API does not support temperature parameter
     // Temperature is handled differently in Responses API vs Chat API

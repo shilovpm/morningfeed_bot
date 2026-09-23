@@ -32,7 +32,7 @@ class UserService {
       // Create default user settings
       await storage.createUserSettings({
         userId: user.id,
-        openaiModel: 'gpt-5-mini',
+        openaiModel: 'gpt-6-luna',
         summaryLength: 'medium',
         temperature: '0.3',
         maxTokens: 4000,

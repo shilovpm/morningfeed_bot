@@ -113,7 +113,7 @@ model Run {
 model UserSettings {
   id                 String   @id @default(cuid())
   userId             String   @unique @map("user_id")
-  openaiModel        String   @default("gpt-5-mini") @map("openai_model")
+  openaiModel        String   @default("gpt-6-luna") @map("openai_model")
   summaryLength      String   @default("medium") @map("summary_length") // "short" | "medium" | "long"
   temperature        String   @default("0.3")
   maxTokens          Int      @default(2000) @map("max_tokens")

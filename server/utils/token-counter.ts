@@ -19,7 +19,7 @@ export class TokenCounter {
   private static getEncoding(model: string) {
     try {
       const modelName = model.toLowerCase();
-      if (modelName.includes('gpt-5')) {
+      if (modelName.includes('gpt-5') || modelName.includes('gpt-6')) {
         return encoding_for_model('gpt-4o' as TiktokenModel);
       }
       if (modelName.includes('gpt-4o')) {

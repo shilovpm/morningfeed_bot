@@ -742,10 +742,8 @@ async function handleSummaryModel(
           });
           await ctx.reply(`🤖 Выберите модель OpenAI:
 
-1️⃣ GPT-5 (новейшая, рекомендуется)
-2️⃣ GPT-4o (быстрая и качественная)
-3️⃣ GPT-4o Mini (экономичная)
-4️⃣ GPT-3.5 Turbo (базовая)
+1️⃣ GPT-6 Luna (effort: low)
+2️⃣ GPT-6 Sol (effort: medium)
 
 Введите номер модели:`);
           break;
@@ -796,15 +794,13 @@ async function handleSummaryModel(
 
     case 'model':
       const modelMap: Record<string, string> = {
-        '1': 'gpt-5',
-        '2': 'gpt-4o', 
-        '3': 'gpt-4o-mini',
-        '4': 'gpt-3.5-turbo'
+        '1': 'gpt-6-luna',
+        '2': 'gpt-6-sol'
       };
 
       const model = modelMap[choice];
       if (!model) {
-        await ctx.reply('❌ Введите номер от 1 до 4:');
+        await ctx.reply('❌ Введите номер 1 или 2:');
         return;
       }
 

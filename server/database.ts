@@ -17,6 +17,27 @@ export async function initializeDatabase(): Promise<void> {
     await prisma.$connect();
     logger.info('Database connected successfully');
 
+    const [lunaUsers, solUsers] = await prisma.$transaction([
+      prisma.userSettings.updateMany({
+        where: { openaiModel: { in: ['gpt-5-mini', 'gpt-5.6-luna'] } },
+        data: { openaiModel: 'gpt-6-luna' }
+      }),
+      prisma.userSettings.updateMany({
+        where: { openaiModel: { in: ['gpt-5.4', 'gpt-5.6-sol'] } },
+        data: { openaiModel: 'gpt-6-sol' }
+      })
+    ]);
+
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "user_settings" ALTER COLUMN "openai_model" SET DEFAULT 'gpt-6-luna'`
+    );
+
+    logger.info('OpenAI model configuration synchronized', {
+      migratedToLuna: lunaUsers.count,
+      migratedToSol: solUsers.count,
+      defaultModel: 'gpt-6-luna'
+    });
+
     // Run any pending migrations in development
     if (!isPublishedApp()) {
       // This would be handled by deployment in production  

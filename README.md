@@ -79,7 +79,7 @@ npm start
 | `ALLOWED_TELEGRAM_IDS` | By default | Comma-separated Telegram user IDs that may use the bot. |
 | `ADMIN_TELEGRAM_IDS` | No | Comma-separated IDs that receive bot admin permissions and are also allowed. |
 | `ALLOW_ALL_USERS` | No | Set to `true` only to disable the allowlist deliberately. Defaults to `false`. |
-| `OPENAI_SUMMARY_MODEL` | No | Primary model. Defaults to `gpt-5-mini`. |
+| `OPENAI_SUMMARY_MODEL` | No | Primary model. Defaults to `gpt-6-luna`. |
 | `OPENAI_FALLBACK_MODEL` | No | Fallback model. Defaults to `gpt-4.1-mini`. |
 | `OPENAI_ENDPOINT` | No | `auto`, `responses`, or `chat`. Defaults to `auto`. |
 | `OPENAI_DEBUG` | No | Enables extra request metadata logging; prompt and response text are not logged. |

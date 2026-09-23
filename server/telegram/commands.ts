@@ -593,10 +593,8 @@ export const commandHandlers = {
     });
 
     const modelNames: Record<string, string> = {
-      'gpt-5': 'GPT-5 (новейшая)',
-      'gpt-4o': 'GPT-4o',
-      'gpt-4o-mini': 'GPT-4o Mini (рекомендуется)',
-      'gpt-3.5-turbo': 'GPT-3.5 Turbo'
+      'gpt-6-luna': 'GPT-6 Luna (effort: low)',
+      'gpt-6-sol': 'GPT-6 Sol (effort: medium)'
     };
 
     const lengthNames: Record<string, string> = {
